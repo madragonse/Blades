@@ -13,6 +13,7 @@ class Shape2D(Physics):
         self.__lines = []
         self.__rotation_matrix = [[1,1],[1,1]]
         self.__rotation_angle = 0
+        self.rotate(0)
         self.__matrix_op = Matrix_op()
 
 
@@ -31,7 +32,7 @@ class Shape2D(Physics):
         cos_res = math.cos(rad)
         self.__rotation_matrix = [[cos_res, sin_res], [-sin_res, cos_res]]
 
-    def getLinesToDraw(self):
+    def getPoints(self):
         ret = []
         
         for line in self.__lines:
@@ -44,6 +45,27 @@ class Shape2D(Physics):
         return ret
     def move(self, v):
         self._position.move(v)
+
+    
+    def getLines(self):
+        ret = []
+        for line in self.__lines:
+            points = line.getPoints()
+            last_point = points[0]
+            for i in range(1, len(points)):
+                section = [self.__matrix_op.multiply_vector(self.__rotation_matrix, last_point), self.__matrix_op.multiply_vector(self.__rotation_matrix, points[i])]
+                section[0][0] += self._position.getX()
+                section[1][0] += self._position.getX()
+                section[0][1] += self._position.getY()
+                section[1][1] += self._position.getY()
+                ret.append(section)
+                last_point = points[i]
+        return ret
+
+    
+    def __str__(self):
+        return str(self.getLines())
+
 
 
     

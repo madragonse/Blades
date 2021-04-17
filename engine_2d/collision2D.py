@@ -110,9 +110,9 @@ class Collision:
             return False
 
     def shapesCollision(self, s1:Shape2D, s2:Shape2D):
-        s1Points = s1.getLinesToDraw()
-        s2Points = s2.getLinesToDraw()
-
+        s1Points = s1.getLines()
+        s2Points = s2.getLines()
+        
         for p1 in s1Points:
             for p2 in s2Points:
                 res = self.intersects_at(p1, p2)
@@ -120,4 +120,4 @@ class Collision:
                    return res
         return False
 
-
+    

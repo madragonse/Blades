@@ -25,6 +25,6 @@ class Line2D(Points2D):
         for p in self._points:
             print(p)
 
-    #TODO 
+
     def __str__(self):
-        return ("not implemented yet")
+        return str(self.getPoints())
