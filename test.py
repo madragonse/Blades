@@ -49,35 +49,38 @@ s2 = Shape2D([0, 0])
 s2.addLine(l2)
 
 
-from player_model import player_model
+# from models.player_model import player_model
 
-player_left_origin = player_model['origin']
-#player_left_origin[0] *= -1
-player_left_origin[1] *= -1
-player_left = Shape2D([0, 0])
+# player_left_origin = player_model['origin']
+# #player_left_origin[0] *= -1
+# player_left_origin[1] *= -1
+# player_left = Shape2D([0, 0])
 
-for line in player_model['model']:
-    for i in range(0, len(line)):
-        #line[i][0] *= -1
-        line[i][1] *= -1
-
-
-    if len(line) == 2:
-        for p in range(0, len(line)):
-            line[p][0] = line[p][0] - player_left_origin[0]
-            line[p][1] = line[p][1] - player_left_origin[1]
-        player_left.addLine(Line2D(line))
-    else:
-        const_line = []
-        const_line.append([line[0][0] - player_left_origin[0], line[0][1] - player_left_origin[1]])
-        for i in range(1, len(line)):
-            const_line.append([const_line[i-1][0] + line[i][0], const_line[i-1][1] + line[i][1]])
-        const_line.append(const_line[0])
-        player_left.addLine(Line2D(const_line))
+# for line in player_model['model']:
+#     for i in range(0, len(line)):
+#         #line[i][0] *= -1
+#         line[i][1] *= -1
 
 
-s1 = player_left
+#     if len(line) == 2:
+#         for p in range(0, len(line)):
+#             line[p][0] = line[p][0] - player_left_origin[0]
+#             line[p][1] = line[p][1] - player_left_origin[1]
+#         player_left.addLine(Line2D(line))
+#     else:
+#         const_line = []
+#         const_line.append([line[0][0] - player_left_origin[0], line[0][1] - player_left_origin[1]])
+#         for i in range(1, len(line)):
+#             const_line.append([const_line[i-1][0] + line[i][0], const_line[i-1][1] + line[i][1]])
+#         const_line.append(const_line[0])
+#         player_left.addLine(Line2D(const_line))
+from models.load_models import get_player_l, get_player_r
+from models.player_model import player_model
 
+
+
+print(get_player_l())
+s1 = get_player_r()
 while True:
     # Clear the screen  
     pen.clear()
