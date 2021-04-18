@@ -10,7 +10,7 @@ def __load_model(model_raw, origin, xr = 1, yr = 1) -> Shape2D:
 
     player_left_origin[0] *= xr
     player_left_origin[1] *= yr
-    player_left = Shape2D([0, 0])
+    player_left = Shape2D()
 
     for line in player_model:
         for i in range(0, len(line)):

@@ -37,7 +37,7 @@ wn.tracer(0)
 
 collision_tool = Collision()
 l2 = Line2D([[-40, -40], [40,40]])
-s2 = Shape2D([0, 0])
+s2 = Shape2D()
 s2.addLine(l2)
 
 from models.load_models import get_player_l, get_player_r
