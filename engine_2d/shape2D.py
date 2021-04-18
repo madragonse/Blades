@@ -19,7 +19,7 @@ class Shape2D(Physics):
 
     def addLine(self, line:Line2D):
         self.__lines.append(line)
-    
+
 
     def rotate(self, angle):
         self.__rotation_angle += angle
@@ -31,6 +31,7 @@ class Shape2D(Physics):
         sin_res = math.sin(rad)
         cos_res = math.cos(rad)
         self.__rotation_matrix = [[cos_res, sin_res], [-sin_res, cos_res]]
+
 
     def getPoints(self):
         ret = []

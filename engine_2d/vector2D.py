@@ -40,7 +40,10 @@ class Vector2D:
         return Vector2D([self.__position[0]/divider, self.__position[1]/divider])
     
     def __add__(self, component):
-        return Vector2D([self.__position[0]+component.getX(), self.__position[1]+component.getY()])
+        if type(component) == Vector2D:
+            return Vector2D([self.__position[0]+component.getX(), self.__position[1]+component.getY()])
+        else:
+            return Vector2D([self.__position[0]+component, self.__position[1]+component])
 
     def __sub__(self, subtractor):
         return Vector2D([self.__position[0]-subtractor.getX(), self.__position[1]-subtractor.getY()])
