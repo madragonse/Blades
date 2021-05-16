@@ -1,5 +1,6 @@
 
 from math import sqrt
+from typing import List
 
 class Vector2D:
     
@@ -42,6 +43,8 @@ class Vector2D:
     def __add__(self, component):
         if type(component) == Vector2D:
             return Vector2D([self.__position[0]+component.getX(), self.__position[1]+component.getY()])
+        # elif type(component) == list:
+        #     return Vector2D([self.__position[0]+component[0], self.__position[1]+component[1]])
         else:
             return Vector2D([self.__position[0]+component, self.__position[1]+component])
 

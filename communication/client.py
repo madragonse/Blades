@@ -62,7 +62,7 @@ class Client():
 
     def __recive_tcp(self):
         while True:
-            print('RECIVING')
+            #print('RECIVING TCP')
             data = self.__socket_tcp.recv(2048)
             if not data:
                 time.sleep(0.001)
@@ -76,7 +76,7 @@ class Client():
             if len(self.__send_tcp_data) > 0:
                 with self.__lock_sen_tcp:
                     for data in self.__send_tcp_data: 
-                        print("SENDING TCP")
+                        #print("SENDING TCP")
                         self.__socket_tcp.send(data)
                     self.__send_tcp_data = []
             time.sleep(0.001)
@@ -84,7 +84,7 @@ class Client():
     def __recive_udp(self):
         while True:
             data = self.__socket_udp.recv(2048)
-            print('RECIVING UDP')
+            #print('RECIVING UDP')
             if not data:
                 time.sleep(0.01)
                 continue
@@ -97,7 +97,7 @@ class Client():
             if len(self.__send_udp_data) > 0:
                 with self.__lock_sen_udp:
                     for data in self.__send_udp_data: 
-                        print("SENDING UDP")
+                        #print("SENDING UDP")
                         self.__socket_udp.sendto(data, (self.__server_ip, self.__server_udp_port))
                     self.__send_udp_data = []
             time.sleep(0.01)

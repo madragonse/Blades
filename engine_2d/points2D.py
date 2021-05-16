@@ -12,4 +12,8 @@ class Points2D:
         for i in range(0, self._points.__len__()):
             self._points[i].move(v)
 
+    def scale(self, scale):
+        for i in range(0, len(self._points)):
+            self._points[i] = self._points[i]*scale
+
     

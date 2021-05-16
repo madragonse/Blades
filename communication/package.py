@@ -20,12 +20,9 @@ class Package():
     def get_type(self):
         return self.__type
 
+
     def __str__(self) -> str:
         return(str(self.__message))
-
-    
-    def __repr__(self):
-        return self.get_bytes()
 
 
     def player_position(self, player_id:int, position:List, angle:float):

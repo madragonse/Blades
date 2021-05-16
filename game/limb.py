@@ -9,21 +9,31 @@ from engine_2d.matrixOp import Matrix_op
 
 class Limb():
 
-    def __init__(self, position:Vector2D, length1, length2, dir=-1):
+    def __init__(self, position:Vector2D, length1, length2, dir=-1, end_pos=None):
         self.__matrix_op = Matrix_op()
 
         self.length1 = length1
         self.length2 = length2
         self.position = position
-        self.end = (position + (length1 / sqrt(2)))
+        if end_pos == None:
+            self.end = (position + (length1 / sqrt(2)))
+        else:
+            self.end = end_pos
         self.__dir = dir
         self.__rotation_matrix = None
+        self.joint = None
         self.rotate()
         self.calculate()
 
 
     def set_position(self, position:Vector2D):
-        self.position = position
+        diff = position - self.position
+        if (self.end + diff - position).length() > (self.length1 + self.length2):
+            return 1
+        else:
+            self.position = position
+            self.end += diff
+            return 0
 
     
     def set_end_position(self, position:Vector2D):
@@ -37,8 +47,11 @@ class Limb():
     def rotate(self):
         
         end_relative = self.end - self.position
-        sin_val = end_relative.getX()/end_relative.length()
-        cos_val = end_relative.getY()/end_relative.length()
+        try:
+            sin_val = end_relative.getX()/end_relative.length()
+            cos_val = end_relative.getY()/end_relative.length()
+        except ZeroDivisionError as e:
+            return
         self.__rotation_matrix = [[cos_val, self.__dir*sin_val], [self.__dir*-sin_val, cos_val]]
 
     
@@ -47,12 +60,14 @@ class Limb():
         length = self.end - self.position
         length = length.length()
 
-
-        x = length + (( pow(self.length1, 2) - pow(self.length2, 2) - pow(length, 2) )/( 2*length ))
+        try:
+            x = length + (( pow(self.length1, 2) - pow(self.length2, 2) - pow(length, 2) )/( 2*length ))
+        except ZeroDivisionError as e:
+            return
 
         y = sqrt(pow(self.length1, 2) - pow(x, 2))
 
-        self.joint = Vector2D([x, y])
+        self.joint = Vector2D([x, y]) + self.position
 
 
     def get_sections(self):
