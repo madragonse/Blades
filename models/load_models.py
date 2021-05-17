@@ -1,6 +1,10 @@
 from engine_2d.shape2D import Shape2D
 from models.player_model import player_model
 from models.sword_model import sword_model
+from models.hearth_model import hearth_model
+from models.looser_model import looser_model
+from models.winner_model import winner_model
+
 from engine_2d.line2D import Line2D
 import copy
 
@@ -50,3 +54,14 @@ def get_player_r(scale=4):
 
 def get_sword(scale=4):
     return __load_model(sword_model['model'], sword_model['origin'], 1, -1, scale) 
+
+
+def get_hearth(scale=1):
+    return __load_model(hearth_model['model'], hearth_model['origin'], 1, -1, scale) 
+
+def get_looser_model(scale=1):
+    return __load_model(looser_model['model'], looser_model['origin'], 1, -1, scale) 
+
+
+def get_winner_model(scale=1):
+    return __load_model(winner_model['model'], winner_model['origin'], 1, -1, scale) 

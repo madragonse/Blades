@@ -6,9 +6,11 @@ from communication.server import Server
 from communication.client import Client
 from communication.package import Package
 from communication.parser import LOCollector
+from models.load_models import get_hearth, get_looser_model, get_winner_model
 from datetime import datetime
 
 
+import random
 import turtle
 import keyboard
 import time
@@ -31,6 +33,7 @@ class Game:
         self.__pen = pen
 
         wn = turtle.Screen()
+        wn.colormode(255)
         wn.setup(width = SCREEN_WIDTH + 20, height = SCREEN_HEIGHT + 20)
         wn.title("Collision detection test")
         wn.bgcolor("black")
@@ -50,6 +53,9 @@ class Game:
         self.__hit = False
         self.__last_hit = False
         self.__hitted = False
+
+        self.__game_on = {'val':True, 'winner':None}
+        self.__hearth = get_hearth()
 
         
     def __render(self, pen, line):
@@ -87,7 +93,17 @@ class Game:
             linesToDraw = shape.getLines()
             for line in linesToDraw:
                 self.__render(self.__pen, line) 
+        
+        pos_h = [-200*2, 200*2]
+        for i in range(0, int(self.controlled.health/HIT_DAMAGE)):
+            pos_h[0] += 70
+            self.__hearth.set_position(Vector2D(pos_h))
+            linesToDraw = self.__hearth.getLines()
+            for line in linesToDraw:
+                self.__render(self.__pen, line) 
+
         self.__window.update()
+        
 
 
     def __mirror_point(self, point:List)-> List:
@@ -110,7 +126,6 @@ class Game:
             else:
                 ret = {'target':'sword', 'position':sword}
         else:
-            #print('hit' + str(datetime.now()))
             ret = {'target':'body', 'position':sword}
         
         return ret
@@ -124,8 +139,6 @@ class Game:
         self.__comm.append_udp_send(self.__package.get_bytes())
 
         hit = self.check_hit()
-        print(hit['target'], end=' ')
-        print(self.__hit)
         if hit['target'] == 'sword':
             self.__package.hit_mark(hit['position'], 0, 0, 'sword')
             self.__comm.append_udp_send(self.__package.get_bytes())
@@ -156,12 +169,53 @@ class Game:
                 
                 if p['type'] == 'playerHealth':
                     self.__hitted = True
+                    self.controlled.health = p['value']
+                    print(self.controlled.health)
+                    if self.controlled.health == 0:
+                        self.__game_on['val'] = False
+                        self.__game_on['winner'] = False
+                        self.__package.game_status('iLost')
+                        self.__comm.append_tcp_send(self.__package.get_bytes())
                 
+                if p['type'] == 'gameStatus':
+                    self.__game_on['val'] = False
+                    self.__game_on['winner'] = True
 
+
+    def winner(self):
+        scull = get_winner_model(3)
+        scull.set_position(Vector2D([-200*1.3, 200*1]))
+        for i in range(0, 300):
+            self.__pen.color((20, random.randint(100, 255), 0))
+            self.__pen.clear()
+            
+            linesToDraw = scull.getLines()
+            for line in linesToDraw:
+                self.__render(self.__pen, line) 
+
+            self.__window.update()
+            time.sleep(0.05)
+
+
+    def looser(self):
+        scull = get_looser_model(10)
+        scull.set_position(Vector2D([-200*1, 200*1]))
+        for i in range(0, 300):
+            self.__pen.color(random.randint(100, 255), 0, 0)
+            self.__pen.clear()
+            
+            linesToDraw = scull.getLines()
+            for line in linesToDraw:
+                self.__render(self.__pen, line) 
+
+            self.__window.update()
+            time.sleep(0.05)
+
+            
 
 
     def game_loop(self):
-        while True:
+        while self.__game_on['val']:
             self.__pen.clear()
             time.sleep(0.02)
             # if keyboard.is_pressed('up'):
@@ -191,4 +245,11 @@ class Game:
             self.__recive_data_and_execute() 
 
             self.__draw()
+        
+        if self.__game_on['winner']:
+            print('YOU WIN')
+            self.winner()
+        else:
+            print('YOU LOOST')
+            self.looser()
 

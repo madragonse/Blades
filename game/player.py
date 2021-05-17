@@ -82,7 +82,7 @@ class Player():
 
 
     def set_damage(self, value:float)-> bool:
-        self.health += value
+        self.health -= value
         if self.health < 0:
             self.health = 0
             return False
