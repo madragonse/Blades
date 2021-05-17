@@ -6,9 +6,9 @@ from communication.server import Server
 from communication.client import Client
 from communication.package import Package
 from communication.parser import LOCollector
-from models.load_models import get_hearth, get_looser_model, get_winner_model
+from models.load_models import get_hearth, get_looser_model, get_winner_model, get_tag_model
 from datetime import datetime
-
+from timeit import default_timer as timer
 
 import random
 import turtle
@@ -18,6 +18,7 @@ import time
 SCREEN_WIDTH = 800  
 SCREEN_HEIGHT = 600
 HIT_DAMAGE = 20
+SPEED = 0.4
 
 class Game:
     def __init__(self, controlled_position:Vector2D, oponent_position:Vector2D, server_port=5004, server_address:str = None):
@@ -53,6 +54,9 @@ class Game:
         self.__hit = False
         self.__last_hit = False
         self.__hitted = False
+        self.__tag = get_tag_model(0.3)
+        self.__tag_e = get_tag_model(0.4)
+        self.__tag_e.v = 0
 
         self.__game_on = {'val':True, 'winner':None}
         self.__hearth = get_hearth()
@@ -87,7 +91,7 @@ class Game:
             self.__hitted = False
             self.__pen.color('red')
         else:
-            self.__pen.color('white')
+            self.__pen.color((220,255,220))
         shatpe_to_draw = self.controlled.get_shapes()
         for shape in shatpe_to_draw:
             linesToDraw = shape.getLines()
@@ -99,6 +103,21 @@ class Game:
             pos_h[0] += 70
             self.__hearth.set_position(Vector2D(pos_h))
             linesToDraw = self.__hearth.getLines()
+            for line in linesToDraw:
+                self.__render(self.__pen, line) 
+
+        if self.__hit:
+            self.__pen.color('red')
+        else:
+            self.__pen.color('yellow')
+        linesToDraw = self.__tag.getLines()
+        for line in linesToDraw:
+            self.__render(self.__pen, line) 
+
+        self.__pen.color('red')
+        if self.__tag_e.v > 0:
+            self.__tag_e.v -= 1
+            linesToDraw = self.__tag_e.getLines()
             for line in linesToDraw:
                 self.__render(self.__pen, line) 
 
@@ -123,10 +142,13 @@ class Game:
         if body == False or sword != False:
             if sword == False:
                 ret = {'target':'air', 'position':None}
+                self.__tag.set_position(Vector2D([3000,0]))
             else:
                 ret = {'target':'sword', 'position':sword}
+                self.__tag.set_position(Vector2D(sword))
         else:
-            ret = {'target':'body', 'position':sword}
+            ret = {'target':'body', 'position':body}
+            self.__tag.set_position(Vector2D(body))
         
         return ret
 
@@ -140,11 +162,11 @@ class Game:
 
         hit = self.check_hit()
         if hit['target'] == 'sword':
-            self.__package.hit_mark(hit['position'], 0, 0, 'sword')
-            self.__comm.append_udp_send(self.__package.get_bytes())
+            # self.__package.hit_mark(hit['position'], 0, 0, 'sword')
+            # self.__comm.append_udp_send(self.__package.get_bytes())
             self.__hit = False
         elif hit['target'] == 'body':
-            self.__package.hit_mark(hit['position'], 0, 0, 'body')
+            self.__package.hit_mark(self.__mirror_point(hit['position']), 0, 0, 'body')
             self.__comm.append_udp_send(self.__package.get_bytes())
             if self.__hit == False:
                 self.__hit = True
@@ -180,6 +202,12 @@ class Game:
                 if p['type'] == 'gameStatus':
                     self.__game_on['val'] = False
                     self.__game_on['winner'] = True
+                
+                if p['type'] == 'hitMark':
+                    if p['target'] == 'body':
+                        self.__tag_e.set_position(Vector2D(p['position']))
+                        self.__tag_e.v = 50
+
 
 
     def winner(self):
@@ -187,7 +215,7 @@ class Game:
         scull.set_position(Vector2D([-200*1.3, 200*1]))
         for i in range(0, 300):
             self.__pen.color((20, random.randint(100, 255), 0))
-            self.__pen.clear()
+            #self.__pen.clear()
             
             linesToDraw = scull.getLines()
             for line in linesToDraw:
@@ -202,7 +230,7 @@ class Game:
         scull.set_position(Vector2D([-200*1, 200*1]))
         for i in range(0, 300):
             self.__pen.color(random.randint(100, 255), 0, 0)
-            self.__pen.clear()
+            #self.__pen.clear()
             
             linesToDraw = scull.getLines()
             for line in linesToDraw:
@@ -212,33 +240,42 @@ class Game:
             time.sleep(0.05)
 
             
+    
+
 
 
     def game_loop(self):
+        start = timer()
         while self.__game_on['val']:
+            while timer() - start < 0.01:
+                time.sleep(0.0001)
+            start = timer()
             self.__pen.clear()
-            time.sleep(0.02)
+            time.sleep(0.01)
+
             # if keyboard.is_pressed('up'):
             #     self.controlled.move(Vector2D([0, 5]))
             # if keyboard.is_pressed('down'):
             #     self.controlled.move(Vector2D([0, -5]))
             if keyboard.is_pressed('left'):
-                self.controlled.move(Vector2D([-5, 0]))
+                self.controlled.move(Vector2D([-5*SPEED, 0]))
+                #self.controlled.move_sword(Vector2D([-5*SPEED, 0]))
             if keyboard.is_pressed('right'):
-                self.controlled.move(Vector2D([5, 0]))
+                self.controlled.move(Vector2D([5*SPEED, 0]))
+                #self.controlled.move_sword(Vector2D([5*SPEED, 0]))
 
             if keyboard.is_pressed('w'):
-                self.controlled.move_sword(Vector2D([0, 7]))
+                self.controlled.move_sword(Vector2D([0, 7*SPEED]))
             if keyboard.is_pressed('s'):
-                self.controlled.move_sword(Vector2D([0, -7]))
+                self.controlled.move_sword(Vector2D([0, -7*SPEED]))
             if keyboard.is_pressed('a'):
-                self.controlled.move_sword(Vector2D([-7, 0]))
+                self.controlled.move_sword(Vector2D([-7*SPEED, 0]))
             if keyboard.is_pressed('d'):
-                self.controlled.move_sword(Vector2D([7, 0]))
+                self.controlled.move_sword(Vector2D([7*SPEED, 0]))
             if keyboard.is_pressed('q'):
-                self.controlled.rotate_sword(10)
+                self.controlled.rotate_sword(9*SPEED)
             if keyboard.is_pressed('e'):
-                self.controlled.rotate_sword(-10)
+                self.controlled.rotate_sword(-9*SPEED)
 
             self.__send_data()
 

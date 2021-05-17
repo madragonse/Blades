@@ -4,6 +4,7 @@ from models.sword_model import sword_model
 from models.hearth_model import hearth_model
 from models.looser_model import looser_model
 from models.winner_model import winner_model
+from models.tag_model import tag_model
 
 from engine_2d.line2D import Line2D
 import copy
@@ -65,3 +66,7 @@ def get_looser_model(scale=1):
 
 def get_winner_model(scale=1):
     return __load_model(winner_model['model'], winner_model['origin'], 1, -1, scale) 
+
+
+def get_tag_model(scale=1):
+    return __load_model(tag_model['model'], tag_model['origin'], 1, -1, scale) 
