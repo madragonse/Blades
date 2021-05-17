@@ -7,7 +7,7 @@ from typing import List, final
 def from_bytes_list(stream:List)->List:
     ret = []
     for data in stream:
-        sp_dat = data.decode('utf-8').split('.')
+        sp_dat = data.decode('utf-8').split('|')
         for pac_b in sp_dat:
             if pac_b == '':
                 break
@@ -28,7 +28,7 @@ class LOCollector:
         
 
         for data in stream:
-            sp_dat = data.decode('utf-8').split('.')
+            sp_dat = data.decode('utf-8').split('|')
             if self.__LO != None:
                 # print('-----------------------------------------------------------------++')
                 # print('LO: '+str(self.__LO))

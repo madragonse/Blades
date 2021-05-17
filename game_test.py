@@ -11,7 +11,7 @@ if __name__ == "__main__":
             break
         if keyboard.is_pressed('n'):
             print('Insert server IP address:port: ', end='')
-            server_addr_s = input()
+            server_addr_s = '169.254.189.31:5004'#input()
             server_addr = server_addr_s.split(':')
             print(server_addr)
             game = Game(Vector2D([-100, 0]), Vector2D([100, 0]), server_address=server_addr[0], server_port=int(server_addr[1]))

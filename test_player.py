@@ -65,6 +65,7 @@ while True:
     if keyboard.is_pressed('d'):
         test_player.move_sword(Vector2D([7, 0]))
     if keyboard.is_pressed('q'):
+        #test_player.set_sword_angle(90)
         test_player.rotate_sword(10)
     if keyboard.is_pressed('e'):
         test_player.rotate_sword(-10)

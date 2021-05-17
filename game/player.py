@@ -60,6 +60,10 @@ class Player():
         self.__sword.rotate(angle)
 
 
+    def set_sword_angle(self, angle):
+        self.__sword.rotate(angle-self.__sword.get_angle())
+
+
     def jump(self)-> bool:
         if not self.__in_air:
             pass
@@ -77,10 +81,10 @@ class Player():
         return res
 
 
-    def get_damage(self, value:float)-> bool:
-        self.__health += value
-        if self.__health < 0:
-            self.__health = 0
+    def set_damage(self, value:float)-> bool:
+        self.health += value
+        if self.health < 0:
+            self.health = 0
             return False
         return True
 
@@ -106,3 +110,9 @@ class Player():
 
     def get_position_to_send(self):
         return self.__position.getPosition()
+
+    def get_sword_position_to_send(self):
+        return self.__arm.end.getPosition()
+
+    def get_sword_angle_to_send(self):
+        return self.__sword.get_angle()

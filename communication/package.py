@@ -33,7 +33,7 @@ class Package():
             'angle' : angle
         }
         self.__message = json.dumps(message_content)
-        self.__message = self.__message + '.'
+        self.__message = self.__message + '|'
         self.__type = 'playerPosition'
 
 
@@ -45,7 +45,7 @@ class Package():
             'angle' : angle
         }
         self.__message = json.dumps(message_content)
-        self.__message = self.__message + '.'
+        self.__message = self.__message + '|'
         self.__type = 'swordPosition'
 
 
@@ -56,17 +56,28 @@ class Package():
             'value' : value
         }
         self.__message = json.dumps(message_content)
-        self.__message = self.__message + '.'
+        self.__message = self.__message + '|'
         self.__type = 'playerHealth'
 
 
-    def hit_mark(self, position:List, angle:float, speed:float):
+    def hit_mark(self, position:List, angle:float, speed:float, target:str):
         message_content = {
             'type' : 'hitMark',
             'position' : position, 
             'angle' : angle, 
-            'speed' : speed
+            'speed' : speed,
+            'target' : target
         }
         self.__message = json.dumps(message_content)
-        self.__message = self.__message + '.'
+        self.__message = self.__message + '|'
         self.__type = 'hitMark'
+
+    
+    def game_status(self, status):
+        message_content = {
+            'type' : 'gameStatus',
+            'status' : status
+        }
+        self.__message = json.dumps(message_content)
+        self.__message = self.__message + '|'
+        self.__type = 'gameStatus'

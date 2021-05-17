@@ -1,3 +1,4 @@
+from tkinter.constants import TRUE
 from typing import List
 from engine_2d.vector2D import Vector2D
 from game.player import Player
@@ -5,7 +6,7 @@ from communication.server import Server
 from communication.client import Client
 from communication.package import Package
 from communication.parser import LOCollector
-
+from datetime import datetime
 
 
 import turtle
@@ -14,7 +15,7 @@ import time
 
 SCREEN_WIDTH = 800  
 SCREEN_HEIGHT = 600
-
+HIT_DAMAGE = 20
 
 class Game:
     def __init__(self, controlled_position:Vector2D, oponent_position:Vector2D, server_port=5004, server_address:str = None):
@@ -46,6 +47,10 @@ class Game:
         else:
             self.__comm = Client(server_address, server_port)
 
+        self.__hit = False
+        self.__last_hit = False
+        self.__hitted = False
+
         
     def __render(self, pen, line):
         pen.penup()
@@ -58,11 +63,25 @@ class Game:
 
 
     def __draw(self):
+        # print(self.__last_hit, end=' ')
+        # print(self.__hit)
+        if self.__last_hit != self.__hit and self.__hit == True:
+            self.__last_hit = self.__hit
+            self.__pen.color('red')
+        else:
+            self.__last_hit = self.__hit
+            self.__pen.color('white')
         shatpe_to_draw = self.opponent.get_shapes()
         for shape in shatpe_to_draw:
             linesToDraw = shape.getLines()
             for line in linesToDraw:
                 self.__render(self.__pen, line) 
+        
+        if self.__hitted == True:
+            self.__hitted = False
+            self.__pen.color('red')
+        else:
+            self.__pen.color('white')
         shatpe_to_draw = self.controlled.get_shapes()
         for shape in shatpe_to_draw:
             linesToDraw = shape.getLines()
@@ -79,23 +98,65 @@ class Game:
 
 
     def __mirror_angle(self, angle:int)-> int:
-        return
+        return 360 - angle
 
+
+    def check_hit(self):
+        body = self.controlled.check_sword_colision(self.opponent.get_body())
+        sword = self.controlled.check_sword_colision(self.opponent.get_sword())
+        if body == False or sword != False:
+            if sword == False:
+                ret = {'target':'air', 'position':None}
+            else:
+                ret = {'target':'sword', 'position':sword}
+        else:
+            #print('hit' + str(datetime.now()))
+            ret = {'target':'body', 'position':sword}
+        
+        return ret
 
     
     def __send_data(self):
         self.__package.player_position(1, self.__mirror_point(self.controlled.get_position_to_send()), 0)
         self.__comm.append_udp_send(self.__package.get_bytes())
-        self.__package.sword_position(1, self.__mirror_point(), )
+        
+        self.__package.sword_position(1, self.__mirror_point(self.controlled.get_sword_position_to_send()), self.__mirror_angle(self.controlled.get_sword_angle_to_send()))
         self.__comm.append_udp_send(self.__package.get_bytes())
+
+        hit = self.check_hit()
+        print(hit['target'], end=' ')
+        print(self.__hit)
+        if hit['target'] == 'sword':
+            self.__package.hit_mark(hit['position'], 0, 0, 'sword')
+            self.__comm.append_udp_send(self.__package.get_bytes())
+            self.__hit = False
+        elif hit['target'] == 'body':
+            self.__package.hit_mark(hit['position'], 0, 0, 'body')
+            self.__comm.append_udp_send(self.__package.get_bytes())
+            if self.__hit == False:
+                self.__hit = True
+                self.opponent.set_damage(HIT_DAMAGE)
+                self.__package.player_health(1, self.opponent.health)
+                self.__comm.append_tcp_send(self.__package.get_bytes())
+        else:
+            self.__hit = False
 
     
     def __recive_data_and_execute(self):
         recived = self.__udpLO.from_bytes_list(self.__comm.get_udp_recive())
+        recived.extend(self.__tcpLO.from_bytes_list(self.__comm.get_tcp_recive()))
         if recived != []:
             for p in recived:
                 if p['type'] == 'playerPosition':
                     self.opponent.set_position(Vector2D(p['position']))
+                    
+                if p['type'] == 'swordPosition':
+                    self.opponent.set_sword_angle(int(p['angle']))
+                    self.opponent.set_sword_position(Vector2D(p['position']))
+                
+                if p['type'] == 'playerHealth':
+                    self.__hitted = True
+                
 
 
 

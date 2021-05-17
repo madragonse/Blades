@@ -76,6 +76,10 @@ class Shape2D():
         return ret
 
     
+    def get_angle(self):
+        return self.__rotation_angle
+
+
     def __str__(self):
         return str(self.getLines())
 
