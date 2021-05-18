@@ -1,12 +1,13 @@
 
 from typing import List
-import socket
+import socket, ssl
 import threading
 import time 
 from threading import Thread, Semaphore
 
 from communication.package import Package
 from communication.player import Player
+
 
 
 class Server():
@@ -30,17 +31,23 @@ class Server():
         self.__listening = False
 
         if server_ip == None:
-            self.__server_ip = socket.gethostbyname(socket.gethostname())
+            self.__server_ip = '0.0.0.0'#socket.gethostbyname(socket.gethostname())
         else:
             self.__server_ip = server_ip
+
+
+
         self.__server_port = server_port
         self.__server_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.__server_socket_tcp.bind((self.__server_ip, self.__server_port))
         self.__server_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+
+        self.__server_socket_tcp.bind((self.__server_ip, self.__server_port))
         self.__server_socket_udp.bind((self.__server_ip, udp_port))
 
-
-
+        # self.hostname = 'www.test.org'
+        # self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        # self.context.load_cert_chain(certfile='cert_V2.pem')#, keyfile='key_V2.pem')
 
     def __add_player(self, conn:socket.socket, addr):
         if self.__opponent != None:
@@ -120,6 +127,7 @@ class Server():
     def listen_for_player(self):
         self.__server_socket_tcp.listen()
         print('Listening for player on address {}...'.format(self.__server_ip+':'+str(self.__server_port)))
+        #self.__server_socket_tcp = self.context.wrap_socket(self.__server_socket_tcp, server_side=False, server_hostname=None)
         conn, addr = self.__server_socket_tcp.accept()
         self.__add_player(conn, addr)
         print('Player added')

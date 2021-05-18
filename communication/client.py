@@ -1,7 +1,7 @@
 
 from ast import Str
 from typing import List
-import socket
+import socket, ssl
 import threading
 import time
 from threading import Thread, Semaphore
@@ -31,7 +31,13 @@ class Client():
 
         self.__socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.__socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.__socket_udp.bind((socket.gethostbyname(socket.gethostname()), udp_port))
+
+        self.__socket_udp.bind(('0.0.0.0', udp_port))
+
+        # self.hostname = 'www.test.org'
+        # self.context = ssl.create_default_context()
+
+
 
         self.__connect()
 
@@ -106,6 +112,10 @@ class Client():
     
     def __connect(self):
         self.__socket_tcp.connect((self.__server_ip, self.__server_port))
+
+        #self.__socket_tcp = self.context.wrap_socket(self.__socket_tcp, server_hostname=self.hostname)
+
+
         print('Connected to server')
         print('Starting transmission in thread')
         self.__listening = True

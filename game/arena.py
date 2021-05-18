@@ -9,6 +9,7 @@ from communication.parser import LOCollector
 from models.load_models import get_hearth, get_looser_model, get_winner_model, get_tag_model
 from datetime import datetime
 from timeit import default_timer as timer
+from game.compensation import Compensation
 
 import random
 import turtle
@@ -18,7 +19,7 @@ import time
 SCREEN_WIDTH = 800  
 SCREEN_HEIGHT = 600
 HIT_DAMAGE = 20
-SPEED = 0.4
+SPEED = 1.4
 
 class Game:
     def __init__(self, controlled_position:Vector2D, oponent_position:Vector2D, server_port=5004, server_address:str = None):
@@ -60,6 +61,10 @@ class Game:
 
         self.__game_on = {'val':True, 'winner':None}
         self.__hearth = get_hearth()
+
+        self.__com_op = Compensation()
+        self.__com_sp = Compensation()
+        self.__com_sa = Compensation()
 
         
     def __render(self, pen, line):
@@ -180,14 +185,21 @@ class Game:
     def __recive_data_and_execute(self):
         recived = self.__udpLO.from_bytes_list(self.__comm.get_udp_recive())
         recived.extend(self.__tcpLO.from_bytes_list(self.__comm.get_tcp_recive()))
+        opponent_position = []
+        sword_angle = []
+        sword_position = []
+
         if recived != []:
             for p in recived:
                 if p['type'] == 'playerPosition':
-                    self.opponent.set_position(Vector2D(p['position']))
+                    opponent_position = p['position']
+                    # self.opponent.set_position(Vector2D(opponent_position))
                     
                 if p['type'] == 'swordPosition':
-                    self.opponent.set_sword_angle(int(p['angle']))
-                    self.opponent.set_sword_position(Vector2D(p['position']))
+                    sword_angle = int(p['angle'])
+                    sword_position = p['position']
+                    # self.opponent.set_sword_angle(sword_angle)
+                    # self.opponent.set_sword_position(Vector2D(sword_position))
                 
                 if p['type'] == 'playerHealth':
                     self.__hitted = True
@@ -208,6 +220,10 @@ class Game:
                         self.__tag_e.set_position(Vector2D(p['position']))
                         self.__tag_e.v = 50
 
+                    
+                self.opponent.set_sword_angle(sword_angle)
+                self.opponent.set_sword_position(Vector2D(sword_position))
+                self.opponent.set_position(Vector2D(opponent_position))
 
 
     def winner(self):
