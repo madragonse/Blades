@@ -186,20 +186,20 @@ class Game:
         recived = self.__udpLO.from_bytes_list(self.__comm.get_udp_recive())
         recived.extend(self.__tcpLO.from_bytes_list(self.__comm.get_tcp_recive()))
         opponent_position = []
-        sword_angle = []
+        sword_angle = 0
         sword_position = []
 
         if recived != []:
             for p in recived:
                 if p['type'] == 'playerPosition':
                     opponent_position = p['position']
-                    # self.opponent.set_position(Vector2D(opponent_position))
+                    self.opponent.set_position(Vector2D(opponent_position))
                     
                 if p['type'] == 'swordPosition':
                     sword_angle = int(p['angle'])
                     sword_position = p['position']
-                    # self.opponent.set_sword_angle(sword_angle)
-                    # self.opponent.set_sword_position(Vector2D(sword_position))
+                    self.opponent.set_sword_angle(sword_angle)
+                    self.opponent.set_sword_position(Vector2D(sword_position))
                 
                 if p['type'] == 'playerHealth':
                     self.__hitted = True
@@ -220,10 +220,19 @@ class Game:
                         self.__tag_e.set_position(Vector2D(p['position']))
                         self.__tag_e.v = 50
 
-                    
-                self.opponent.set_sword_angle(sword_angle)
-                self.opponent.set_sword_position(Vector2D(sword_position))
-                self.opponent.set_position(Vector2D(opponent_position))
+
+        # opponent_position = self.__com_op.input(opponent_position)
+        # sword_position = self.__com_sp.input(sword_position)
+        # sword_angle = self.__com_sa.input([sword_angle, 0])[0]
+        
+        # if sword_angle != 0:
+        #     self.opponent.set_sword_angle(sword_angle)
+        # if sword_position != []:
+        #     self.opponent.set_sword_position(Vector2D(sword_position))
+        # if opponent_position != []:
+        #     self.opponent.set_position(Vector2D(opponent_position))
+                
+
 
 
     def winner(self):

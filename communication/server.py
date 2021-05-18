@@ -126,7 +126,7 @@ class Server():
 
     def listen_for_player(self):
         self.__server_socket_tcp.listen()
-        print('Listening for player on address {}...'.format(self.__server_ip+':'+str(self.__server_port)))
+        print('Listening for player on address {}...'.format(str(socket.gethostbyname(socket.gethostname()))+':'+str(self.__server_port)))
         #self.__server_socket_tcp = self.context.wrap_socket(self.__server_socket_tcp, server_side=False, server_hostname=None)
         conn, addr = self.__server_socket_tcp.accept()
         self.__add_player(conn, addr)
