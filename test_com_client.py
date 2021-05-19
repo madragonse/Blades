@@ -11,11 +11,11 @@ udpLO = LOCollector()
 
 while True:
     #print('SEND')
-    package.hit_mark([27,72], 11, 21)
+    package.hit_mark([27,72], 11, 21, 'test')
     client.append_udp_send(package.get_bytes())
-    package.hit_mark([27,72], 11, 21)
+    package.hit_mark([27,72], 11, 21, 'test')
     client.append_tcp_send(package.get_bytes())
-    package.hit_mark([27,72], 11, 21)
+    package.hit_mark([27,72], 11, 21, 'test')
     client.append_tcp_send(package.get_bytes())
     recived = client.get_tcp_recive()
     a = tcpLO.from_bytes_list(recived)
@@ -27,7 +27,7 @@ while True:
         print('UDP health: '+str(a[0]['value']))
 
 
-    package.hit_mark([27,72], 11, 21)
+    package.hit_mark([27,72], 11, 21, 'test')
     client.append_tcp_send(package.get_bytes())
     #time.sleep(2)
     

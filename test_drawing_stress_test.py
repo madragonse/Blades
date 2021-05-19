@@ -42,42 +42,40 @@ s2.addLine(l2)
 
 from models.load_models import get_player_l, get_player_r
 from models.player_model import player_model
+from models.load_models import get_hearth
+from timeit import default_timer as timer
 
 from game.limb import Limb
-
-arm = Limb(Vector2D([0, 0]), 100, 100,-1)
+pos = 0
+hearth = get_hearth()
+stoper = 0
 while True:
     # Clear the screen  
     pen.clear()
     time.sleep(0.02)
 
     if keyboard.is_pressed('up'):
-        arm.set_end_position(arm.end + Vector2D([0, 6]))
+        pos +=5
     if keyboard.is_pressed('down'):
-        arm.set_end_position(arm.end + Vector2D([0, -6]))
-    if keyboard.is_pressed('left'):
-        arm.set_end_position(arm.end + Vector2D([-6, 0]))
-    if keyboard.is_pressed('right'):
-        arm.set_end_position(arm.end + Vector2D([6, 0]))
+        pos -=5
 
-    if keyboard.is_pressed('w'):
-        arm.set_position(arm.position + Vector2D([0, 4]))
-    if keyboard.is_pressed('s'):
-        arm.set_position(arm.position + Vector2D([0, -4]))
-    if keyboard.is_pressed('a'):
-        arm.set_position(arm.position + Vector2D([-4, 0]))
-        #arm = Limb(arm.position, 100, 100, -1, arm.end)
-    if keyboard.is_pressed('d'):
-        arm.set_position(arm.position + Vector2D([4, 0]))
-        #arm = Limb(arm.position, 100, 100, 1, arm.end)
+    print(timer() - stoper)
+    stoper = timer()
+    
+    
+    pos_h = [-200*4 + pos, 0]
+    for i in range(0, 200):
+        pos_h[0] += 30
+        hearth.set_position(Vector2D(pos_h))
+        linesToDraw = hearth.getLines()
+        for line in linesToDraw:
+            render(pen, line)
 
-    arm.calculate()
-
-    pen.color("White")
-    linesToDraw = arm.get_sections()
-    for line in linesToDraw:
-        render(pen, line)  
 
 
     wn.update()
+
+
+
+
 

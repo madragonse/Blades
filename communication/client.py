@@ -101,7 +101,7 @@ class Client():
     def __send_udp(self):
         while True:
             if len(self.__send_udp_data) > 0:
-                time.sleep(0.08)
+                #time.sleep(0.08)
                 with self.__lock_sen_udp:
                     for data in self.__send_udp_data: 
                         #print("SENDING UDP")
